@@ -1,14 +1,18 @@
 <template>
   <div id="app">
-    <h1>黑马头条后台管理</h1>
     <!-- 路由出口 -->
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data () {
+    return {
+      num: 1
+    }
+  }
 }
 </script>
 
