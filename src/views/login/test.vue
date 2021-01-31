@@ -1,7 +1,5 @@
 <template>
-   <div class="">
-
-   </div>
+  <div class></div>
 </template>
 
 <script>
@@ -10,15 +8,18 @@ export default {
   components: {},
   props: {},
   data () {
-    return {}
+    return {};
   },
   computed: {},
   watch: {},
-  created () {},
-  mounted () {},
-  methods: {},
-}
+  created () { },
+  mounted () { },
+  methods: {
+    onClick () {
+      console('hh');
+    }
+  }
+};
 </script>
 
-<style scoped lang ="less">
-</style>
+<style scoped lang="less"></style>

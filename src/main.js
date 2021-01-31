@@ -5,6 +5,8 @@
 import Vue from 'vue'
 import App from './App.vue' // 根组件
 import router from './router'
+// import './mock/index'
+import Router from 'vue-router'
 
 // 加载 element 组件库
 import ElementUI from 'element-ui'
@@ -14,6 +16,13 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 // 加载全局样式文件
 import './styles/index.less'
+
+// 若是没有开启Devtools工具，在开发环境中开启，在生产环境中关闭
+if (process.env.NODE_ENV === 'development') {
+  Vue.config.devtools = true
+} else {
+  Vue.config.devtools = false
+}
 
 // 全局注册element组件
 Vue.use(ElementUI)
@@ -29,3 +38,8 @@ new Vue({
   render: h => h(App)
   // el: '#app' // 等价于 $mount('#app')
 }).$mount('#app')
+
+const originalPush = Router.prototype.push
+Router.prototype.push = function push (location) {
+  return originalPush.call(this, location).catch(err => err)
+}
