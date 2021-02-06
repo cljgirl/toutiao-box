@@ -3,6 +3,10 @@
 */
 import axios from 'axios'
 import JSONbig from 'json-bigint'
+import router from '@/router'
+
+// 非组件模块可以这样加载使用 element 的 message 提示组件
+import { Message } from 'element-ui'
 
 // 创建一个 axios 实例，说白了就是复制了一个 axios
 // 我们通过这个实例去发请求，把需要的配置配置给这个实例来处理
@@ -29,9 +33,6 @@ const request = axios.create({
   ]
 })
 
-// 导出请求方法
-export default request
-
 // 请求拦截器
 request.interceptors.request.use(
   // 任何所有的请求都会经过这里
@@ -43,8 +44,7 @@ request.interceptors.request.use(
     if (user) {
       // `Bearer ${user.token}` 字符串拼接
       // 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDIzMTg2NTEsInVzZXJfaWQiOjEsInJlZnJlc2giOmZhbHNlLCJ2ZXJpZmllZCI6dHJ1ZX0.VwVsL34emQ_xTPwXTeBd-LIuasZuy5m7v778X9vG2UA'
-      config.headers.Authorization =
-        `Bearer ${user.token}`
+      config.headers.Authorization = `Bearer ${user.token}`
     }
     // 然后我们就可以在允许请求出去之前定制统一业务功能处理
     // 例如：统一设置token
@@ -58,7 +58,43 @@ request.interceptors.request.use(
   }
 )
 // 响应拦截器
+request.interceptors.response.use(
+  function (response) {
+    // 任何处于2xx范围内的状态代码都会导致该函数触发
+    // 使用响应数据
+    return response
+  },
+  function (error) {
+    // 任何超出此范围的状态代码的2XX原因此功能可触发
+    // 做一些与响应错误
 
+    const { status } = error.response
+    // 任何超出 2xx 的响应码都会进入这里
+    if (status === 401) {
+      // 跳转到登录页面
+      // 清除本地存储中的用户登录状态
+      window.localStorage.removeItem('user')
+      router.push('/login')
+      Message.error('登录状态无效，请重新登录')
+    } else if (status === 403) {
+      // token 未携带或已过期
+      Message({
+        type: 'warning',
+        message: '没有操作权限'
+      })
+    } else if (status === 400) {
+      // 客户端参数错误
+      Message.error('参数错误，请检查请求参数')
+    } else if (status >= 500) {
+      Message.error('服务端内部异常，请稍后重试')
+    }
+    console.log('状态码异常')
+    return Promise.reject(error)
+  }
+)
+
+// 导出请求方方法
+export default request
 // 谁要使用谁就加载 request 模块
 // import request from 'request.js'
 // request.xxx

@@ -27,6 +27,37 @@
             <el-radio :label="0">无图</el-radio>
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
+          <!--
+            我们需要把选择的封面图片的地址放到article.cover.images 数组中
+
+            当你给事件处理函数传递了自定义参数以后，就无法得到原本的那个数据参数了。
+
+            如果想要在事件处理函数自定义传参以后想要得到原来的那个事件本身的参数，则手动指定$event,它代表事件本身的参数
+
+            在组件上使用v-model
+
+            当你给子组件提供的数据既要使用还要修改，这个时候我们可以使用 v-model 简化数据绑定
+            v-model="article.cover.images[index]"
+            给子组件传递了一个名字叫value的数据
+            :value="article.cover.images[index]"
+            默认监听 input 事件，当事件发生，它会让 绑定数据 = 事件参数
+            @input="article.cover.images[index] = 事件参数"
+          -->
+          <template v-if="article.cover.type > 0">
+            <upload-cover
+              :key="cover"
+              v-for="(cover, index) in article.cover.type"
+              v-model="article.cover.images[index]"
+            />
+            <!--
+               <upload-cover
+              :key="cover"
+              v-for="(cover, index) in article.cover.type"
+               :cover-image ="article.cover.images[index]"
+              @update-cover="onUpdateCover(index, $event)"
+            />
+            -->
+          </template>
         </el-form-item>
         <el-form-item label="频道" prop="channel_id">
           <el-select v-model="article.channel_id" placeholder="请选择活动区域">
@@ -79,9 +110,10 @@ import {
 } from 'element-tiptap'
 import 'element-tiptap/lib/index.css'
 import { uploadImage } from '@/api/image'
+import UploadCover from './components/upload-cover'
 export default {
   name: 'PublishIndex',
-  components: { 'el-tiptap': ElementTiptap },
+  components: { 'el-tiptap': ElementTiptap, UploadCover },
   props: {},
   data () {
     return {
@@ -215,6 +247,9 @@ export default {
         // 模板绑定展示
         this.article = res.data.data
       })
+    },
+    onUpdateCover (index, url) {
+      this.article.cover.images[index] = url
     }
   }
 }
